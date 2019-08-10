@@ -1,0 +1,28 @@
+<div class="author-byline<%
+    if (typeof additionalClasses !== 'undefined') {
+        %><%= additionalClasses %><%
+    }
+    %>"
+    itemprop="author" itemscope 
+    itemtype="http://schema.org/Person" <%
+    if (typeof id !== 'undefined' && id) {
+        %>id="<%= id %>" <%
+    }
+    if (typeof style !== 'undefined' && style) {
+        %>style="<%= style %>" <%
+    }
+    %>>
+By <%
+    let count = 0;
+    for (let author of authors) {
+        if (count++ > 0) {
+            %>, <%
+        }
+        %>
+        <span itemprop="name" class="author-name-wrapper">
+        <a href="<%= url %>" rel="author" itemprop="url">
+        <%= fullname %></a></span>
+        <%
+    }
+%>
+</div>
