@@ -6,12 +6,12 @@
   },
   "name": "@akashacms/plugins-authors",
   "description": "A plugin for AkashaCMS to support acknowledging authors",
-  "homepage": "http://akashacms.com/plugins/authors.html",
+  "homepage": "http://akashacms.com/plugins/authors/index.html",
   "repository": {
     "type": "git",
     "url": "git://github.com/akashacms/akashacms-plugin-authors.git"
   },
-  "version": "0.7.0",
+  "version": "0.7.1",
   "engines": {
     "node": ">=12.2"
   },
