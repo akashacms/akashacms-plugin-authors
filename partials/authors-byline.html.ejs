@@ -18,11 +18,11 @@ By <%
         if (count++ > 0) {
             %>, <%
         }
-        %>
-        <span itemprop="name" class="author-name-wrapper">
-        <a href="<%= url %>" rel="author" itemprop="url">
-        <%= fullname %></a></span>
-        <%
+        if (typeof author.url !== 'undefined') { 
+            %><span itemprop="name" class="author-name-wrapper"><a href="<%= author.url %>" rel="author" itemprop="url"><%= author.fullname %></a></span><% 
+        } else { 
+            %><%= author.fullname %><% 
+        }
     }
 %>
 </div>

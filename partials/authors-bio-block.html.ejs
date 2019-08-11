@@ -1,0 +1,28 @@
+<div <%
+    if (typeof additionalClasses !== 'undefined') {
+        %>class="author-bio-block <%= additionalClasses %>" <%
+    } else {
+        %>class="author-bio-block" <%
+    }
+    if (typeof id !== 'undefined' && id) {
+        %>id="<%= id %>" <%
+    }
+    if (typeof style !== 'undefined' && style) {
+        %>style="<%= style %>" <%
+    }
+    %>>
+    <%
+    for (let author of authors) {
+        if (typeof author.bio === 'string') {
+            %>
+            <div class="author-bio-block-name">
+            <%= author.fullname %>
+            </div>
+            <div class="author-bio-block-bio">
+            <%- author.bio %>
+            </div>
+            <%
+        }
+    }
+    %>
+</div>

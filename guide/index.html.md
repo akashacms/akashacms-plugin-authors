@@ -21,7 +21,7 @@ Add the following to `package.json`
 ```json
 "dependencies": {
     ...
-    "@akashacms/plugin-author": ">=0.7"
+    "@akashacms/plugins-author": ">=0.7"
     ...
 }
 ```
@@ -42,12 +42,14 @@ config
             {
                 code: "boygeorge",
                 fullname: "Boy George",
-                url: "URL"
+                url: "URL",
+                bio: "<p>Weird ass british rocker</p>"
             },
             {
                 code: "eltonjohn",
                 fullname: "Elton John",
-                url: "URL"
+                url: "URL",
+                bio: "<p>Mainstream british rocker</p>"
             }
         ]
     })
@@ -57,14 +59,14 @@ config
 
 # Custom Tags
 
-## `author-byline`
+## `authors-byline`
 
 ```html
-<author-byline data-authors='[ "authorcode" ]'></author-byline>
+<authors-byline data-authors='[ "authorcode" ]'></author-byline>
 
 OR
 
-<author-byline data-authors="authorcode"></author-byline>
+<authors-byline data-authors="authorcode"></author-byline>
 ```
 
 The other attributes are:
@@ -81,4 +83,27 @@ The data provided is:
 * `additionalClasses` -- Any class value supplied, or `undefined`
 * `authors` -- The author objects corresponding to the supplied authorcode(s)
 
+## `authors-bio-block`
+
+```html
+<authors-bio-block data-authors="eltonjohn"></authors-bio-block>
+
+OR
+
+<authors-bio-block data-authors='[ "boygeorge", "eltonjohn" ]'></authors-bio-block>
+```
+
+The other attributes are:
+
+* `template="partial-file.html.ejs"` -- Override the default template, `authors-bio-block.html.ejs`
+* `id="ID"` -- An ID attribute for the outer element
+* `class="class"` -- Additional class values for the outer element
+* `style="style"` -- CSS style attribute
+
+The data provided is:
+
+* `id` - The ID attribute if any (`undefined` otherwise)
+* `style` - The style attribute if any (`undefined` otherwise) 
+* `additionalClasses` -- Any class value supplied, or `undefined`
+* `authors` -- The author objects corresponding to the supplied authorcode(s)
 

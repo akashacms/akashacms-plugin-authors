@@ -17,6 +17,7 @@
  */
 
 const util     = require('util');
+const path     = require('path');
 const akasha   = require('akasharender');
 const mahabhuta = akasha.mahabhuta;
 
@@ -40,82 +41,133 @@ module.exports = class AuthorsPlugin extends akasha.Plugin {
     get config() { return this[_plugin_config]; }
     get options() { return this[_plugin_options]; }
 
-    findAuthor(author) {
-        for (let aut of this.options.authors) {
-            this.isAuthor(aut);
-            if (aut.code === author) {
-                return aut;
-            }
-        }
-        return undefined;
-    }
-
-    // Type Guard
-    isAuthor(author) {
-        if (typeof author !== 'object') {
-            throw new Error(`isAuthor - author object must be object ${util.inspect(author)}`);
-        }
-        if (typeof author.fullname !== 'string'
-         || typeof author.url !== 'string') {
-            throw new Error(`isAuthor - invalid author object ${util.inspect(author)}`);
-        }
-        return true;
-    }
-
 };
 
-TODO -- support a bio block
+function findAuthor(options, author) {
+    if (author === "default") {
+        author = options.default;
+    }
+    if (typeof author !== 'string') {
+        throw new Error(`findAuthor supplied author must be a string value ${util.inspect(author)}`);
+    }
+    for (let aut of options.authors) {
+        if (isAuthor(aut) && aut.code === author) {
+            return aut;
+        }
+    }
+    return undefined;
+}
 
-TODO -- in template if no url then do not output the <a> tag
+// Type Guard
+function isAuthor(author) {
+    if (typeof author !== 'object') {
+        throw new Error(`isAuthor - author object must be object ${util.inspect(author)}`);
+    }
+    if (typeof author.fullname !== 'string'
+        || typeof author.url !== 'string') {
+        throw new Error(`isAuthor - invalid author object ${util.inspect(author)}`);
+    }
+    return true;
+}
+
+const getAuthors = (options, $element, metadata) => {
+    let authors;
+    if ($element.data('authors')) {
+        authors = $element.data('authors');
+    } else if (metadata.authors) {
+        authors = metadata.authors;
+    } else {
+        authors = [ "default" ];
+    }
+    if (typeof authors === 'string') authors = [ authors ];
+
+    if (!Array.isArray(authors)) {
+        throw new Error(`getAuthors invalid author object ${util.inspect(author)}`);
+    }
+
+    // console.log(`getAuthors looking for ${util.inspect(authors)}`);
+
+    let authorList = [];
+    for (let aut of authors) {
+        let found = findAuthor(options, aut);
+        if (!found) {
+            throw new Error(`getAuthors did not find author ${util.inspect(aut)}`);
+        }
+        authorList.push(found);
+    }
+
+    // console.log(`getAuthors found ${util.inspect(authorList)}`);
+    return authorList;
+};
+
+const getID = ($element) => {
+    return $element.attr('id')
+        ? $element.attr('id')
+        : undefined;
+};
+
+const getAdditionalClasses = ($element) => {
+    return $element.attr('class')
+        ? $element.attr('class')
+        : undefined;
+};
+
+const getStyle = ($element) => {
+    return $element.attr('style')
+        ? $element.attr('style') 
+        : undefined;
+};
+
+const getTemplate = ($element, _default) => {
+    return $element.attr("template")
+        ? $element.attr("template")
+        : _default;
+};
+
+module.exports.process = async function(text, metadata, options) {
+    let funcs = module.exports.mahabhutaArray(options);
+    // console.log(`process received metadata ${util.inspect(metadata)}`);
+    // console.log(`process received funcs ${util.inspect(funcs)}`);
+    let ret = await mahabhuta.processAsync(text, metadata, funcs);
+    // console.log(`process returning ${ret}`);
+    return ret;
+};
 
 module.exports.mahabhutaArray = function(options) {
     let ret = new mahabhuta.MahafuncArray(pluginName, options);
     ret.addMahafunc(new AuthorBylineElement());
+    ret.addMahafunc(new AuthorBioElement());
     return ret;
 };
 
 class AuthorBylineElement extends mahabhuta.CustomElement {
     get elementName() { return "authors-byline"; }
     async process($element, metadata, dirty) {
-        const id    = $element.attr('id')
-                    ? $element.attr('id')
-                    : undefined;
-        const _classes = $element.attr('class')
-                    ? $element.attr('class')
-                    : undefined;
-        const style = $element.attr('style')
-                    ? $element.attr('style') 
-                    : undefined;
-        const template = $element.attr("template")
-                    ? $element.attr("template")
-                    : "authors-byline.html.ejs";
-        const authors = $element.data('authors') 
-                    ? $element.data('authors') 
-                    : "default";
-        if (typeof authors === 'string') authors = [ authors ];
-        if (!Array.isArray(authors)) {
-            throw new Error(`authors-byline invalid author object ${util.inspect(author)}`);
-        }
 
-        let authorList = [];
-        for (let aut of authors) {
-            let found = this.array.options.config.plugin(pluginName)
-                    .findAuthor(aut);
-            if (!found) {
-                throw new Error(`authors-byline did not find author ${util.inspect(aut)}`);
-            }
-            authorList.push(found);
-        }
-        
+        /* TODO for an author thumbnail they are to pass in an href  */
 
-        /* TODO for an author thumbnail they are to pass in an href
+        // console.log(`AuthorBylineElement ${util.inspect(metadata)}`);
 
-        TODO write guide page  */
+        return akasha.partial(this.array.options.config, 
+            getTemplate($element, "authors-byline.html.ejs"), {
+            id: getID($element),
+            style: getStyle($element), 
+            additionalClasses: getAdditionalClasses($element),
+            authors: getAuthors(this.array.options, $element, metadata)
+        });
+    }
+}
 
-        return akasha.partial(this.array.options.config, template, {
-            id, style, 
-            additionalClasses: _classes,
-            authors: authorList
+
+class AuthorBioElement extends mahabhuta.CustomElement {
+    get elementName() { return "authors-bio-block"; }
+    async process($element, metadata, dirty) {
+        return akasha.partial(this.array.options.config, 
+            getTemplate($element, "authors-bio-block.html.ejs"), {
+            id: getID($element),
+            style: getStyle($element), 
+            additionalClasses: getAdditionalClasses($element),
+            authors: getAuthors(this.array.options, $element, metadata)
         });
     }
 }
