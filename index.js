@@ -74,6 +74,7 @@ const getAuthors = (options, $element, metadata) => {
     let authors;
     if ($element.data('authors')) {
         authors = $element.data('authors');
+        // console.log(`getAuthors data authors ${util.inspect(authors)}`);
     } else if (metadata.authors) {
         authors = metadata.authors;
     } else {
@@ -100,7 +101,7 @@ const getAuthors = (options, $element, metadata) => {
     return authorList;
 };
 
-const getID = ($element) => {
+const getID = ($element) => { 
     return $element.attr('id')
         ? $element.attr('id')
         : undefined;
