@@ -1,19 +1,19 @@
 {
-    "name": "authors-test",
-    "version": "1.0.0",
-    "description": "Test suite for authors module",
-    "main": "index.js",
-    "scripts": {
-      "test": "mocha ./index"
-    },
-    "author": "",
-    "license": "ISC",
-    "dependencies": {
-      "chai": "^4.1.2",
-      "cheerio": "^1.0.0-rc.2",
-      "mocha": "^5.2.0",
-      "akasharender": "github:akashacms/akasharender",
-      "mahabhuta": "github:akashacms/mahabhuta"
-    }
+  "name": "authors-test",
+  "version": "1.0.0",
+  "description": "Test suite for authors module",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha ./index",
+    "setup": "npm install && cd .. && npm install akasharender mahabhuta --no-save",
+    "clean": "rm -rf node_modules out"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "chai": "^4.1.2",
+    "cheerio": "^1.0.0-rc.2",
+    "fs-extra": "^8.1.0",
+    "mocha": "^5.2.0"
   }
-  
+}
