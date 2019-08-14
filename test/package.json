@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "mocha ./index",
-    "setup": "npm install && cd .. && npm install akasharender mahabhuta --no-save",
+    "setup": "npm install && cd .. && npm install akashacms/akasharender akashacms/mahabhuta --no-save",
     "clean": "rm -rf node_modules out"
   },
   "author": "",
