@@ -11,12 +11,12 @@
     "type": "git",
     "url": "git://github.com/akashacms/akashacms-plugin-authors.git"
   },
-  "version": "0.7.3",
+  "version": "0.7.4",
   "engines": {
     "node": ">=12.2"
   },
   "scripts": {
-      "publish": "npm publish --access public",
+      "dopublish": "npm publish --access public",
       "test-setup": "cd test && npm run setup",
       "test": "cd test && npm test",
       "clean": "cd test && npm run clean"
