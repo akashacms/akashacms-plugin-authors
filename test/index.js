@@ -44,14 +44,7 @@ config.prepare();
 
 describe('default author', function() {
     it('should find the default author', async function() {
-        let found = await akasha.findRendersTo(config, '/no-author.html');
-        let result = await akasha.renderDocument(
-                    config,
-                    found.foundDir,
-                    found.foundPathWithinDir,
-                    config.renderTo,
-                    found.foundMountedOn,
-                    found.foundBaseMetadata);
+        let result = await akasha.renderPath(config, '/no-author.html');
 
         assert.exists(result, 'result exists');
         assert.isString(result, 'result isString');
@@ -59,11 +52,10 @@ describe('default author', function() {
         assert.include(result, 'documents/no-author.html.md');
         assert.include(result, 'out/no-author.html');
 
-        let html = await fs.readFile('out/no-author.html', 'utf8');
+        let { html, $ } = await akasha.readRenderedFile(config, 'no-author.html');
 
         assert.exists(html, 'result exists');
         assert.isString(html, 'result isString');
-        let $ = cheerio.load(html);
         assert.include($('.author-byline .author-name-wrapper a').html(), "Boy George");
         assert.notInclude($('.author-byline .author-name-wrapper a').html(), "Elton John");
     });
@@ -78,14 +70,7 @@ describe('bad author author fails', function() {
         let caught;
 
         try {
-            found = await akasha.findRendersTo(config, '/bad-author.html');
-            result = await akasha.renderDocument(
-                        config,
-                        found.foundDir,
-                        found.foundPathWithinDir,
-                        config.renderTo,
-                        found.foundMountedOn,
-                        found.foundBaseMetadata);
+            result = await akasha.renderPath(config, '/bad-author.html');
         } catch (e) {
             throwed = true;
             caught = e;
@@ -103,14 +88,7 @@ describe('bad author author fails', function() {
 
 describe('chosen author', function() {
     it('should find the chosen author', async function() {
-        let found = await akasha.findRendersTo(config, '/author-elton.html');
-        let result = await akasha.renderDocument(
-                    config,
-                    found.foundDir,
-                    found.foundPathWithinDir,
-                    config.renderTo,
-                    found.foundMountedOn,
-                    found.foundBaseMetadata);
+        let result = await akasha.renderPath(config, '/author-elton.html');
 
         assert.exists(result, 'result exists');
         assert.isString(result, 'result isString');
@@ -118,11 +96,10 @@ describe('chosen author', function() {
         assert.include(result, 'documents/author-elton.html.md');
         assert.include(result, 'out/author-elton.html');
 
-        let html = await fs.readFile('out/author-elton.html', 'utf8');
+        let { html, $ } = await akasha.readRenderedFile(config, 'author-elton.html');
 
         assert.exists(html, 'result exists');
         assert.isString(html, 'result isString');
-        let $ = cheerio.load(html);
         assert.notInclude($('.author-byline .author-name-wrapper a').html(), "Boy George");
         assert.include($('.author-byline .author-name-wrapper a').html(), "Elton John");
     });
@@ -131,14 +108,7 @@ describe('chosen author', function() {
 
 describe('multiple authors', function() {
     it('should find multiple authors', async function() {
-        let found = await akasha.findRendersTo(config, '/author-multi.html');
-        let result = await akasha.renderDocument(
-                    config,
-                    found.foundDir,
-                    found.foundPathWithinDir,
-                    config.renderTo,
-                    found.foundMountedOn,
-                    found.foundBaseMetadata);
+        let result = await akasha.renderPath(config, '/author-multi.html');
 
         assert.exists(result, 'result exists');
         assert.isString(result, 'result isString');
@@ -146,11 +116,10 @@ describe('multiple authors', function() {
         assert.include(result, 'documents/author-multi.html.md');
         assert.include(result, 'out/author-multi.html');
 
-        let html = await fs.readFile('out/author-multi.html', 'utf8');
+        let { html, $ } = await akasha.readRenderedFile(config, 'author-multi.html');
 
         assert.exists(html, 'result exists');
         assert.isString(html, 'result isString');
-        let $ = cheerio.load(html);
         assert.include($('.author-byline .author-name-wrapper:nth-child(2) a').html(), "Boy George");
         assert.include($('.author-byline .author-name-wrapper:nth-child(1) a').html(), "Elton John");
     });
@@ -159,14 +128,7 @@ describe('multiple authors', function() {
 
 describe('inline authors', function() {
     it('should find inline authors', async function() {
-        let found = await akasha.findRendersTo(config, '/author-inline.html');
-        let result = await akasha.renderDocument(
-                    config,
-                    found.foundDir,
-                    found.foundPathWithinDir,
-                    config.renderTo,
-                    found.foundMountedOn,
-                    found.foundBaseMetadata);
+        let result = await akasha.renderPath(config, '/author-inline.html');
 
         assert.exists(result, 'result exists');
         assert.isString(result, 'result isString');
@@ -174,11 +136,10 @@ describe('inline authors', function() {
         assert.include(result, 'documents/author-inline.html.md');
         assert.include(result, 'out/author-inline.html');
 
-        let html = await fs.readFile('out/author-inline.html', 'utf8');
+        let { html, $ } = await akasha.readRenderedFile(config, 'author-inline.html');
 
         assert.exists(html, 'result exists');
         assert.isString(html, 'result isString');
-        let $ = cheerio.load(html);
         assert.include($('#boy .author-name-wrapper a').html(), "Boy George");
         assert.include($('#elton .author-name-wrapper a').html(), "Elton John");
         assert.include($('#both .author-name-wrapper:nth-child(2) a').html(), "Boy George");
@@ -189,14 +150,7 @@ describe('inline authors', function() {
 
 describe('author bios', function() {
     it('should find author bios', async function() {
-        let found = await akasha.findRendersTo(config, '/author-bio.html');
-        let result = await akasha.renderDocument(
-                    config,
-                    found.foundDir,
-                    found.foundPathWithinDir,
-                    config.renderTo,
-                    found.foundMountedOn,
-                    found.foundBaseMetadata);
+        let result = await akasha.renderPath(config, '/author-bio.html');
 
         assert.exists(result, 'result exists');
         assert.isString(result, 'result isString');
@@ -204,12 +158,11 @@ describe('author bios', function() {
         assert.include(result, 'documents/author-bio.html.md');
         assert.include(result, 'out/author-bio.html');
 
-        let html = await fs.readFile('out/author-bio.html', 'utf8');
+        let { html, $ } = await akasha.readRenderedFile(config, 'author-bio.html');
 
         assert.exists(html, 'result exists');
         assert.isString(html, 'result isString');
-        let $ = cheerio.load(html);
-
+        
         assert.include($('#default .author-bio-block-name').html(), "Boy George");
         assert.include($('#default .author-bio-block-bio').html(), "Boy George BIO");
 
