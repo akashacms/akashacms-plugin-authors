@@ -208,3 +208,10 @@ describe('author bios', function() {
     });
 
 });
+
+
+describe('forced failure', function() {
+    it('should force build fail', async function() {
+        assert.isTrue(false);
+    });
+});
