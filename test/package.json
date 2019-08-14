@@ -12,8 +12,6 @@
   "license": "ISC",
   "dependencies": {
     "chai": "^4.1.2",
-    "cheerio": "^1.0.0-rc.2",
-    "fs-extra": "^8.1.0",
     "mocha": "^5.2.0"
   }
 }

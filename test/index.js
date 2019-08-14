@@ -2,8 +2,6 @@
 const akasha   = require('akasharender');
 const plugin = require('../index');
 const { assert } = require('chai');
-const cheerio = require('cheerio');
-const fs      = require('fs-extra');
 
 const authorconfig = {
     default: "boygeorge",
@@ -64,7 +62,6 @@ describe('default author', function() {
 describe('bad author author fails', function() {
     it('should fail for author not found', async function() {
         
-        let found;
         let result;
         let throwed = false;
         let caught;
