@@ -16,7 +16,7 @@
     "node": ">=12.2"
   },
   "scripts": {
-      "dopublish": "npm publish --access public",
+      "dopublish": "npm publish --access public"
   },
   "dependencies": {
   }
