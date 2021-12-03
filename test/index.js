@@ -40,16 +40,49 @@ config.setMahabhutaConfig({
 });
 config.prepare();
 
+describe('build site', function() {
+
+    it('should run setup', async function() {
+        this.timeout(75000);
+        await akasha.cacheSetup(config);
+        await Promise.all([
+            akasha.setupDocuments(config),
+            akasha.setupAssets(config),
+            akasha.setupLayouts(config),
+            akasha.setupPartials(config)
+        ])
+        let filecache = await akasha.filecache;
+        await Promise.all([
+            filecache.documents.isReady(),
+            filecache.assets.isReady(),
+            filecache.layouts.isReady(),
+            filecache.partials.isReady()
+        ]);
+    });
+
+    it('should build site', async function() {
+        this.timeout(60000);
+        let failed = false;
+        let results = await akasha.render(config);
+        for (let result of results) {
+            if (typeof result.error !== 'undefined') {
+                if (result.error
+                 && result.error.toString().includes('bad-author.html.md ')
+                 && result.error.toString().includes('caught error in CustomElement(authors-byline)')
+                 && result.error.toString().includes("getAuthors did not find author 'badauthor-not-found'")) {
+                     // This is an expected error
+                     continue;
+                }
+                failed = true;
+                console.error(result.error);
+            }
+        }
+        assert.isFalse(failed);
+    });
+});
+
 describe('default author', function() {
     it('should find the default author', async function() {
-        let result = await akasha.renderPath(config, '/no-author.html');
-
-        assert.exists(result, 'result exists');
-        assert.isString(result, 'result isString');
-        assert.include(result, '.html.md');
-        assert.include(result, 'documents/no-author.html.md');
-        assert.include(result, 'out/no-author.html');
-
         let { html, $ } = await akasha.readRenderedFile(config, 'no-author.html');
 
         assert.exists(html, 'result exists');
@@ -85,14 +118,6 @@ describe('bad author author fails', function() {
 
 describe('chosen author', function() {
     it('should find the chosen author', async function() {
-        let result = await akasha.renderPath(config, '/author-elton.html');
-
-        assert.exists(result, 'result exists');
-        assert.isString(result, 'result isString');
-        assert.include(result, '.html.md');
-        assert.include(result, 'documents/author-elton.html.md');
-        assert.include(result, 'out/author-elton.html');
-
         let { html, $ } = await akasha.readRenderedFile(config, 'author-elton.html');
 
         assert.exists(html, 'result exists');
@@ -105,14 +130,6 @@ describe('chosen author', function() {
 
 describe('multiple authors', function() {
     it('should find multiple authors', async function() {
-        let result = await akasha.renderPath(config, '/author-multi.html');
-
-        assert.exists(result, 'result exists');
-        assert.isString(result, 'result isString');
-        assert.include(result, '.html.md');
-        assert.include(result, 'documents/author-multi.html.md');
-        assert.include(result, 'out/author-multi.html');
-
         let { html, $ } = await akasha.readRenderedFile(config, 'author-multi.html');
 
         assert.exists(html, 'result exists');
@@ -125,14 +142,6 @@ describe('multiple authors', function() {
 
 describe('inline authors', function() {
     it('should find inline authors', async function() {
-        let result = await akasha.renderPath(config, '/author-inline.html');
-
-        assert.exists(result, 'result exists');
-        assert.isString(result, 'result isString');
-        assert.include(result, '.html.md');
-        assert.include(result, 'documents/author-inline.html.md');
-        assert.include(result, 'out/author-inline.html');
-
         let { html, $ } = await akasha.readRenderedFile(config, 'author-inline.html');
 
         assert.exists(html, 'result exists');
@@ -147,14 +156,6 @@ describe('inline authors', function() {
 
 describe('author bios', function() {
     it('should find author bios', async function() {
-        let result = await akasha.renderPath(config, '/author-bio.html');
-
-        assert.exists(result, 'result exists');
-        assert.isString(result, 'result isString');
-        assert.include(result, '.html.md');
-        assert.include(result, 'documents/author-bio.html.md');
-        assert.include(result, 'out/author-bio.html');
-
         let { html, $ } = await akasha.readRenderedFile(config, 'author-bio.html');
 
         assert.exists(html, 'result exists');
@@ -209,3 +210,11 @@ describe('author bios', function() {
 
 });
 
+
+describe('shutdown', function() {
+
+    it('should close the configuration', async function() {
+        this.timeout(75000);
+        await akasha.closeCaches();
+    });
+});
