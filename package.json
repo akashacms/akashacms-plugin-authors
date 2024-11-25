@@ -26,9 +26,11 @@
     "type": "git",
     "url": "git://github.com/akashacms/akashacms-plugin-authors.git"
   },
+  "main": "index.mjs",
+  "type": "module",
   "version": "0.8.0",
   "engines": {
-    "node": ">=12.2"
+    "node": ">=20.0"
   },
   "scripts": {
       "dopublish": "npm publish --access public"

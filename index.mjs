@@ -16,17 +16,19 @@
  *  limitations under the License.
  */
 
-const util     = require('util');
-const path     = require('path');
-const akasha   = require('akasharender');
+import util from 'node:util';
+import path from 'node:path';
+import akasha from 'akasharender';
 const mahabhuta = akasha.mahabhuta;
+
+const __dirname = import.meta.dirname;
 
 const pluginName = "@akashacms/plugin-authors";
 
 const _plugin_config = Symbol('config');
 const _plugin_options = Symbol('options');
 
-module.exports = class AuthorsPlugin extends akasha.Plugin {
+export class AuthorsPlugin extends akasha.Plugin {
     constructor() { super(pluginName); }
 
     configure(config, options) {
@@ -34,7 +36,7 @@ module.exports = class AuthorsPlugin extends akasha.Plugin {
         this[_plugin_options] = options;
         options.config = config;
 		config.addPartialsDir(path.join(__dirname, 'partials'));
-        config.addMahabhuta(module.exports.mahabhutaArray(options));
+        config.addMahabhuta(mahabhutaArray(options));
         if (!options.authors) options.authors = [];
 	}
 
@@ -125,8 +127,8 @@ const getTemplate = ($element, _default) => {
         : _default;
 };
 
-module.exports.process = async function(text, metadata, options) {
-    let funcs = module.exports.mahabhutaArray(options);
+export async function process(text, metadata, options) {
+    let funcs = mahabhutaArray(options);
     // console.log(`process received metadata ${util.inspect(metadata)}`);
     // console.log(`process received funcs ${util.inspect(funcs)}`);
     let ret = await mahabhuta.processAsync(text, metadata, funcs);
@@ -134,7 +136,7 @@ module.exports.process = async function(text, metadata, options) {
     return ret;
 };
 
-module.exports.mahabhutaArray = function(options) {
+export function mahabhutaArray(options) {
     let ret = new mahabhuta.MahafuncArray(pluginName, options);
     ret.addMahafunc(new AuthorBylineElement());
     ret.addMahafunc(new AuthorBioElement());
