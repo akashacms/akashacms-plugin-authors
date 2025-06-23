@@ -16,30 +16,37 @@
  *  limitations under the License.
  */
 
-const util     = require('util');
-const path     = require('path');
-const akasha   = require('akasharender');
+import util from 'node:util';
+import path from 'node:path';
+import akasha, {
+    Configuration,
+    CustomElement,
+    Munger,
+    PageProcessor
+} from 'akasharender';
 const mahabhuta = akasha.mahabhuta;
+
+const __dirname = import.meta.dirname;
 
 const pluginName = "@akashacms/plugin-authors";
 
-const _plugin_config = Symbol('config');
-const _plugin_options = Symbol('options');
-
-module.exports = class AuthorsPlugin extends akasha.Plugin {
+export class AuthorsPlugin extends akasha.Plugin {
     constructor() { super(pluginName); }
 
+    #config;
+
     configure(config, options) {
-        this[_plugin_config] = config;
-        this[_plugin_options] = options;
+        this.#config = config;
+        this.akasha = config.akasha;
+        this.options = options ? options : {};
         options.config = config;
 		config.addPartialsDir(path.join(__dirname, 'partials'));
-        config.addMahabhuta(module.exports.mahabhutaArray(options));
+        config.addMahabhuta(mahabhutaArray(options, config, this.akasha, this));
         if (!options.authors) options.authors = [];
 	}
 
-    get config() { return this[_plugin_config]; }
-    get options() { return this[_plugin_options]; }
+    get config() { return this.#config; }
+    // get options() { return this[_plugin_options]; }
 
 };
 
@@ -125,8 +132,8 @@ const getTemplate = ($element, _default) => {
         : _default;
 };
 
-module.exports.process = async function(text, metadata, options) {
-    let funcs = module.exports.mahabhutaArray(options);
+export async function process(text, metadata, options) {
+    let funcs = mahabhutaArray(options);
     // console.log(`process received metadata ${util.inspect(metadata)}`);
     // console.log(`process received funcs ${util.inspect(funcs)}`);
     let ret = await mahabhuta.processAsync(text, metadata, funcs);
@@ -134,14 +141,19 @@ module.exports.process = async function(text, metadata, options) {
     return ret;
 };
 
-module.exports.mahabhutaArray = function(options) {
+export function mahabhutaArray(
+    options,
+    config, // ?: Configuration,
+    akasha, // ?: any,
+    plugin, //?: Plugin
+) {
     let ret = new mahabhuta.MahafuncArray(pluginName, options);
-    ret.addMahafunc(new AuthorBylineElement());
-    ret.addMahafunc(new AuthorBioElement());
+    ret.addMahafunc(new AuthorBylineElement(config, akasha, plugin));
+    ret.addMahafunc(new AuthorBioElement(config, akasha, plugin));
     return ret;
 };
 
-class AuthorBylineElement extends mahabhuta.CustomElement {
+class AuthorBylineElement extends CustomElement {
     get elementName() { return "authors-byline"; }
     async process($element, metadata, dirty) {
 
@@ -149,21 +161,25 @@ class AuthorBylineElement extends mahabhuta.CustomElement {
 
         // console.log(`AuthorBylineElement ${util.inspect(metadata)}`);
 
-        return akasha.partial(this.array.options.config, 
-            getTemplate($element, "authors-byline.html.ejs"), {
+        const data = {
             id: getID($element),
             style: getStyle($element), 
             additionalClasses: getAdditionalClasses($element),
             authors: getAuthors(this.array.options, $element, metadata)
-        });
+        };
+        // console.log(`authors-byline ${util.inspect(data)}`);
+        const ret = await this.akasha.partial(this.config, 
+            getTemplate($element, "authors-byline.html.ejs"), data);
+        // console.log(`author-byline result ${ret}`);
+        return ret;
     }
 }
 
 
-class AuthorBioElement extends mahabhuta.CustomElement {
+class AuthorBioElement extends CustomElement {
     get elementName() { return "authors-bio-block"; }
     async process($element, metadata, dirty) {
-        return akasha.partial(this.array.options.config, 
+        return this.akasha.partial(this.config, 
             getTemplate($element, "authors-bio-block.html.ejs"), {
             id: getID($element),
             style: getStyle($element), 

@@ -21,7 +21,7 @@ Add the following to `package.json`
 ```json
 "dependencies": {
     ...
-    "@akashacms/plugins-author": ">=0.7"
+    "@akashacms/plugins-author": "^0.9.x"
     ...
 }
 ```
@@ -31,7 +31,7 @@ Once added to `package.json` run: `npm install`
 
 # Configuration
 
-Add the following to `config.js`
+Add the following to `config.js` 
 
 ```
 config
@@ -56,6 +56,34 @@ config
     ...
 ```
 
+If your config file is in ESM format, it is called `config.mjs` and the plugin is handled this way:
+
+```js
+// ...
+import { AuthorsPlugin } from '@akashacms/plugins-authors';
+// ...
+config.
+    // ...
+
+    .use(AuthorsPlugin, {
+        default: "boygeorge",
+        authors: [
+            {
+                code: "boygeorge",
+                fullname: "Boy George",
+                url: "Boy-George-URL",
+                bio: "<p>Weird ass british rocker</p>"
+            },
+            {
+                code: "eltonjohn",
+                fullname: "Elton John",
+                url: "Elton-John-URL",
+                bio: "<p>Mainstream british rocker</p>"
+            }
+        ]
+    })
+    // ...
+```
 
 # Custom Tags
 
@@ -106,4 +134,3 @@ The data provided is:
 * `style` - The style attribute if any (`undefined` otherwise) 
 * `additionalClasses` -- Any class value supplied, or `undefined`
 * `authors` -- The author objects corresponding to the supplied authorcode(s)
-
