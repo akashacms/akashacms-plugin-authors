@@ -46,7 +46,6 @@ export class AuthorsPlugin extends akasha.Plugin {
 	}
 
     get config() { return this.#config; }
-    // get options() { return this[_plugin_options]; }
 
 };
 
